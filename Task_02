@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stopwatch with Lap Times</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: url('https://www.transparenttextures.com/patterns/black-linen.png');
+            /* Background texture */
+            color: white;
+        }
+
+        #display {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        button {
+            font-size: 1em;
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #333;
+            border: none;
+            color: white;
+            transition: background-color 0.3s ease;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        #lapList {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        #lapList li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Stopwatch with Lap Times</h1>
+    <div id="display">00:00:00</div>
+    <button id="startStop" onclick="startStop()">Start</button>
+    <button id="lapReset" onclick="lapReset()">Lap/Reset</button>
+    <ul id="lapList"></ul>
+
+    <script>
+        let timer; // To hold the reference to the setInterval function
+        let running = false; // To track if the stopwatch is running
+        let time = 0; // To hold the elapsed time
+        let lapStartTime; // To hold the lap start time
+
+        function startStop() {
+            if (running) {
+                clearInterval(timer); // Stop the timer
+                document.getElementById('startStop').textContent = 'Start'; // Change button text to Start
+            } else {
+                timer = setInterval(updateDisplay, 1000); // Start the timer
+                document.getElementById('startStop').textContent = 'Stop'; // Change button text to Stop
+                lapStartTime = new Date().getTime(); // Set lap start time
+            }
+            running = !running; // Toggle running state
+        }
+
+        function updateDisplay() {
+            time++; // Increment elapsed time
+            let hours = Math.floor(time / 3600);
+            let minutes = Math.floor((time % 3600) / 60);
+            let seconds = time % 60;
+            document.getElementById('display').textContent = formatTime(hours) + ':' + formatTime(minutes) + ':' + formatTime(seconds);
+        }
+
+        function formatTime(time) {
+            return (time < 10 ? '0' : '') + time; // Add leading zero if time is single digit
+        }
+
+        function lapReset() {
+            if (running) {
+                let lapTime = new Date().getTime() - lapStartTime; // Calculate lap time
+                let lapHours = Math.floor(lapTime / 3600000);
+                let lapMinutes = Math.floor((lapTime % 3600000) / 60000);
+                let lapSeconds = Math.floor((lapTime % 60000) / 1000);
+                let lapMilliseconds = lapTime % 1000;
+
+                let lapDisplay = formatTime(lapHours) + ':' + formatTime(lapMinutes) + ':' + formatTime(lapSeconds) + '.' + formatMilliseconds(lapMilliseconds);
+
+                let lapItem = document.createElement('li');
+                lapItem.textContent = lapDisplay;
+
+                document.getElementById('lapList').appendChild(lapItem); // Append lap time to lap list
+                lapStartTime = new Date().getTime(); // Reset lap start time
+            } else {
+                clearInterval(timer); // Stop the timer
+                time = 0; // Reset elapsed time
+                document.getElementById('display').textContent = '00:00:00'; // Reset display
+                document.getElementById('startStop').textContent = 'Start'; // Reset button text
+                document.getElementById('lapList').innerHTML = ''; // Clear lap list
+                running = false; // Reset running state
+            }
+        }
+
+        function formatMilliseconds(milliseconds) {
+            return (milliseconds < 100 ? '0' : '') + (milliseconds < 10 ? '0' : '') + milliseconds; // Add leading zeros if milliseconds is less than 100 or 10
+        }
+    </script>
+</body>
+
+</html>
